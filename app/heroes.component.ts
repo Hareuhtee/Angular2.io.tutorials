@@ -10,12 +10,15 @@ import { HeroService } from './hero.service';
   moduleId: module.id,
   selector: 'heroes',
   templateUrl: 'heroes.component.html',
-  styleUrls: ['heroes.component.css']
+  styleUrls: ['heroes.component.css'],
+  directives: [HeroDetailComponent]
 })
 
 export class HeroesComponent implements OnInit {
   heroes: Hero[]; 
   selectedHero: Hero;
+  error: any;
+  addingHero: boolean;
 
   constructor(private heroService:HeroService, private router:Router) {}
 
@@ -29,6 +32,30 @@ export class HeroesComponent implements OnInit {
 
   onSelect(hero:Hero){
     this.selectedHero = hero;
+  }
+
+  addHero(){
+    this.addingHero = true;
+    this.selectedHero = null;
+  }
+
+  close(savedHero:Hero){
+    this.addingHero = false;
+    if (savedHero) {
+      this.getHeroes();
+    }
+  }
+
+  deleteHero(deletedHero:Hero, event:any){
+    event.stopPropagation();
+    this.heroService.delete(deletedHero)
+          .then(response=>{
+            this.heroes = this.heroes.filter(hero => hero !== deletedHero);
+      if (this.selectedHero === deletedHero){
+        this.selectedHero = null; 
+      }       
+      })
+      .catch(error=>this.error = error);    
   }
 
   gotoDetail(){

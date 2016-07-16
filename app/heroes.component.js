@@ -11,6 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 //Angular Framework
 var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
+//App
+var hero_detail_component_1 = require('./hero-detail.component');
 var hero_service_1 = require('./hero.service');
 var HeroesComponent = (function () {
     function HeroesComponent(heroService, router) {
@@ -27,6 +29,28 @@ var HeroesComponent = (function () {
     HeroesComponent.prototype.onSelect = function (hero) {
         this.selectedHero = hero;
     };
+    HeroesComponent.prototype.addHero = function () {
+        this.addingHero = true;
+        this.selectedHero = null;
+    };
+    HeroesComponent.prototype.close = function (savedHero) {
+        this.addingHero = false;
+        if (savedHero) {
+            this.getHeroes();
+        }
+    };
+    HeroesComponent.prototype.deleteHero = function (deletedHero, event) {
+        var _this = this;
+        event.stopPropagation();
+        this.heroService.delete(deletedHero)
+            .then(function (response) {
+            _this.heroes = _this.heroes.filter(function (hero) { return hero !== deletedHero; });
+            if (_this.selectedHero === deletedHero) {
+                _this.selectedHero = null;
+            }
+        })
+            .catch(function (error) { return _this.error = error; });
+    };
     HeroesComponent.prototype.gotoDetail = function () {
         var link = ['/detail', this.selectedHero.id];
         this.router.navigate(link);
@@ -36,7 +60,8 @@ var HeroesComponent = (function () {
             moduleId: module.id,
             selector: 'heroes',
             templateUrl: 'heroes.component.html',
-            styleUrls: ['heroes.component.css']
+            styleUrls: ['heroes.component.css'],
+            directives: [hero_detail_component_1.HeroDetailComponent]
         }), 
         __metadata('design:paramtypes', [hero_service_1.HeroService, router_1.Router])
     ], HeroesComponent);
